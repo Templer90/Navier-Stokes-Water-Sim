@@ -39,15 +39,15 @@ namespace Physic {
         for (int k = 0; k < iter; k++) {
             for (int j = 1; j < N - 1; j++) {
                 for (int i = 1; i < N - 1; i++) {
-                    x[IX(i, j, N)] = (x0[IX(i, j, N)] + a * (
-                              x[IX(i + 1, j, N)]
+                    x[IX(i, j, N)] = (x0[IX(i, j, N)]
+                                      + a * (
+                            x[IX(i + 1, j, N)]
                             + x[IX(i - 1, j, N)]
                             + x[IX(i, j + 1, N)]
                             + x[IX(i, j - 1, N)]
-                            + x[IX(i, j, N)]
-                            + x[IX(i, j, N)]
-                    )
-                                     ) * cRecip;
+                            + (x[IX(i, j, N)] * 2.0f)
+                                )
+                    ) * cRecip;
                 }
             }
             Physics::SetBnd(b, x, N);
@@ -55,7 +55,7 @@ namespace Physic {
     }
 
     void Physics::Diffuse(Boundry b, float x[], float x0[], float diff, float dt, int iter, int N) {
-        float a = dt * diff * (N - 2) * (N - 2);
+        float a = dt * diff * (float)((N - 2) * (N - 2));
         Physics::LinSolve(b, x, x0, a, 1 + 6 * a, iter, N);
     }
 

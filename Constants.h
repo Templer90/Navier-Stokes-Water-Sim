@@ -4,7 +4,8 @@
 #define ScreenWidth 512
 #define ScreenHeight 512
 
-#define GridWidth 128
+#define Power 7
+#define GridWidth (1<<Power)
 #define GridHeight GridWidth // Square Size
 #define GridSize GridWidth*GridHeight
 

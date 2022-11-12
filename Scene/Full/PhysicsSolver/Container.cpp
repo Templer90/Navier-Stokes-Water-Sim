@@ -32,7 +32,7 @@ namespace Physic {
     }
 
     void Container::AddVelocity(float xPos, float yPos, float vx, float vy) {
-        int index = IX((int)xPos, (int)yPos, Physic::Container::size);
+        unsigned int index = IX((int)xPos, (int)yPos, Physic::Container::size);
 
         this->x[index] += vx;
         this->y[index] += vy;

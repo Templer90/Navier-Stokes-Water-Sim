@@ -29,8 +29,10 @@ public:
     static Color &Water() {static Color color(131, 213, 242);return color;};
 
     static void Direct(int r, int g, int b, unsigned char alpha);
-
     static void Direct(int r, int g, int b);
+
+    static void Direct(float r, float g, float b, float alpha);
+    static void Direct(float r, float g, float b);
 };
 
 

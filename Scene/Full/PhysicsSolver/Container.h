@@ -12,15 +12,9 @@ namespace Physic {
 
     class Container {
     private:
-        Physics physics;
-
         float dt{};
         float diff{};
         float visc{};
-
-        float px[GridSize]{};
-        float py[GridSize]{};
-
         float previousDensity[GridSize]{};
 
         static void InitArr(float arr[], int size);
@@ -28,26 +22,28 @@ namespace Physic {
     public:
         static const int size = GridWidth;
         static const int iterations = 16;
+        float density[GridSize]{};
+        float x[GridSize]{};
+        float y[GridSize]{};
+        float px[GridSize]{};
+        float py[GridSize]{};
+
 
         Container();
 
         Container(float dt, float diff, float visc);
 
-        float density[GridSize]{};
+        void AddDensity(float xPos, float yPos, float amount);
 
-        void AddDensity(float x, float y, float amount);
-
-        void AddVelocity(float x, float y, float px, float py);
+        void AddVelocity(float Ppos, float y, float px, float py);
 
         void Step();
 
-        void FadeDensity(int size);
+        void FadeDensity();
 
 
         static float MapToRange(float value, float minIn, float maxIn, float minOut, float maxOut);
 
-        float x[GridSize]{};
-        float y[GridSize]{};
     };
 
 

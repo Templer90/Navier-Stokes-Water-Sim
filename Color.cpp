@@ -17,6 +17,15 @@ void Color::Direct(int r, int g, int b,unsigned char alpha) {
     glColor4ub(r, g, b, alpha);
 }
 
+void Color::Direct(float r, float g, float b,float alpha) {
+    Color::Direct((int)r, (int)g, (int)b, (int)alpha);
+}
+
+void Color::Direct(float r, float g, float b) {
+    Color::Direct((int)r, (int)g, (int)b, 255);
+}
+
+
 void Color::Direct(int r, int g, int b) {
     Color::Direct(r, g, b, 255);
 }

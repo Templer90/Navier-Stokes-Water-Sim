@@ -7,7 +7,7 @@
 #include "../../../Constants.h"
 
 namespace Physic {
-   const int IX(int x, int y, int N);
+    unsigned int IX(unsigned int x, unsigned int y, unsigned int N);
 
     void Physics::SetBnd(Boundry b, float x[], int N) {
         for (int i = 1; i < N - 1; i++) {
@@ -39,23 +39,24 @@ namespace Physic {
         for (int k = 0; k < iter; k++) {
             for (int j = 1; j < N - 1; j++) {
                 for (int i = 1; i < N - 1; i++) {
-                    x[IX(i, j, N)] = (x0[IX(i, j, N)] + a
-                                                        * (x[IX(i + 1, j, N)]
-                                                           + x[IX(i - 1, j, N)]
-                                                           + x[IX(i, j + 1, N)]
-                                                           + x[IX(i, j - 1, N)]
-                                                           + x[IX(i, j, N)]
-                                                           + x[IX(i, j, N)]
-                                                        )) * cRecip;
+                    x[IX(i, j, N)] = (x0[IX(i, j, N)] + a * (
+                              x[IX(i + 1, j, N)]
+                            + x[IX(i - 1, j, N)]
+                            + x[IX(i, j + 1, N)]
+                            + x[IX(i, j - 1, N)]
+                            + x[IX(i, j, N)]
+                            + x[IX(i, j, N)]
+                    )
+                                     ) * cRecip;
                 }
             }
-            this->SetBnd(b, x, N);
+            Physics::SetBnd(b, x, N);
         }
     }
 
     void Physics::Diffuse(Boundry b, float x[], float x0[], float diff, float dt, int iter, int N) {
         float a = dt * diff * (N - 2) * (N - 2);
-        this->LinSolve(b, x, x0, a, 1 + 6 * a, iter, N);
+        Physics::LinSolve(b, x, x0, a, 1 + 6 * a, iter, N);
     }
 
     void Physics::Project(float vx[], float vy[], float p[], float div[], int iter, int N) {
@@ -71,9 +72,9 @@ namespace Physic {
             }
         }
 
-        this->SetBnd(Boundry::None, div, N);
-        this->SetBnd(Boundry::None, p, N);
-        this->LinSolve(Boundry::None, p, div, 1, 6, iter, N);
+        Physics::SetBnd(Boundry::None, div, N);
+        Physics::SetBnd(Boundry::None, p, N);
+        Physics::LinSolve(Boundry::None, p, div, 1, 6, iter, N);
 
         for (int j = 1; j < N - 1; j++) {
             for (int i = 1; i < N - 1; i++) {
@@ -81,8 +82,8 @@ namespace Physic {
                 vy[IX(i, j, N)] -= 0.5f * (p[IX(i, j + 1, N)] - p[IX(i, j - 1, N)]) * N;
             }
         }
-        this->SetBnd(Boundry::XAxis, vx, N);
-        this->SetBnd(Boundry::YAxis, vy, N);
+        Physics::SetBnd(Boundry::XAxis, vx, N);
+        Physics::SetBnd(Boundry::YAxis, vy, N);
     }
 
     void Physics::Advect(Boundry b, float d[], float d0[], float vx[], float vy[], float dt, int N) {
@@ -120,16 +121,16 @@ namespace Physic {
                 t1 = y - j0;
                 t0 = 1.0f - t1;
 
-                int i0i = (int)i0;
-                int i1i = (int)i1;
-                int j0i = (int)j0;
-                int j1i = (int)j1;
+                int i0i = (int) i0;
+                int i1i = (int) i1;
+                int j0i = (int) j0;
+                int j1i = (int) j1;
 
                 d[IX(i, j, N)] =
                         s0 * (t0 * d0[IX(i0i, j0i, N)] + t1 * d0[IX(i0i, j1i, N)]) +
                         s1 * (t0 * d0[IX(i1i, j0i, N)] + t1 * d0[IX(i1i, j1i, N)]);
             }
         }
-        this->SetBnd(b, d, N);
+        Physics::SetBnd(b, d, N);
     }
 } // Physic

@@ -7,7 +7,7 @@
 
 namespace Physic
 {
-    const int IX(int x, int y, int N);
+    unsigned int IX(unsigned int x, unsigned int y, unsigned int N);
 };
 
 

@@ -14,15 +14,27 @@
 
 namespace Scene {
     class Full : public Scene {
-        enum States{
-            Normal,Velocity, HSL
+        enum States {
+            Normal = 0, Velocity, HSL, Previous
         };
+
+        struct EditState {
+            std::string name;
+            States next;
+        };
+
+
     private:
         Physic::Container container;
 
-        int oldMouseX,oldMouseY;
-
-        States editState = Full::Normal;
+        int oldMouseX{}, oldMouseY{};
+        States currentState = Full::Normal;
+        EditState *StatesList = new EditState[]{
+                {"Normal",   States::Velocity},
+                {"Velocety", States::HSL},
+                {"HSL",      States::Previous},
+                {"Previous", States::Normal}
+        };
 
     public:
         Full();

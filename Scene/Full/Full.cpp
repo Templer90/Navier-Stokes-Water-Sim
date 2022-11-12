@@ -8,6 +8,7 @@
 #include "IX.h"
 
 namespace Scene {
+
     Full::Full() {
         container = Physic::Container(0.2f, 0, 0.0000001f);
         Name = "Navier-Stokes";
@@ -25,31 +26,43 @@ namespace Scene {
         }
     }
 
-   void Hsv(int hue,  float sat,  float val, const float d) {
-       hue %= 360;
-       while (hue < 0) hue += 360;
+    void Hsv(int hue, float sat, float val, const float d) {
+        hue %= 360;
+        while (hue < 0) hue += 360;
 
-       if (sat < 0.f) sat = 0.f;
-       if (sat > 1.f) sat = 1.f;
+        if (sat < 0.f) sat = 0.f;
+        if (sat > 1.f) sat = 1.f;
 
-       if (val < 0.f) val = 0.f;
-       if (val > 1.f) val = 1.f;
+        if (val < 0.f) val = 0.f;
+        if (val > 1.f) val = 1.f;
 
-       int h = hue / 60;
-       float f = float(hue) / 60 - h;
-       float p = val * (1.f - sat);
-       float q = val * (1.f - sat * f);
-       float t = val * (1.f - sat * (1 - f));
+        int h = hue / 60;
+        float f = float(hue) / 60 - h;
+        float p = val * (1.f - sat);
+        float q = val * (1.f - sat * f);
+        float t = val * (1.f - sat * (1 - f));
 
-        switch(h) {
+        switch (h) {
             default:
             case 0:
-            case 6:  Color::Direct(val*255, t*255, p*255, d);break;
-            case 1:  Color::Direct(q*255, val*255, p*255, d);break;
-            case 2:  Color::Direct(p*255, val*255, t*255, d);break;
-            case 3:  Color::Direct(p*255, q*255, val*255, d);break;
-            case 4:  Color::Direct(t*255, p*255, val*255, d);break;
-            case 5:  Color::Direct(val*255, p*255, q*255, d);break;
+            case 6:
+                Color::Direct(val * 255, t * 255, p * 255, d);
+                break;
+            case 1:
+                Color::Direct(q * 255, val * 255, p * 255, d);
+                break;
+            case 2:
+                Color::Direct(p * 255, val * 255, t * 255, d);
+                break;
+            case 3:
+                Color::Direct(p * 255, q * 255, val * 255, d);
+                break;
+            case 4:
+                Color::Direct(t * 255, p * 255, val * 255, d);
+                break;
+            case 5:
+                Color::Direct(val * 255, p * 255, q * 255, d);
+                break;
         }
     }
 
@@ -59,7 +72,7 @@ namespace Scene {
 
         this->container.Step();
 
-        switch (editState) {
+        switch (currentState) {
             case Normal:
                 for (int i = 0; i < Physic::Container::size; i++) {
                     for (int j = 0; j < Physic::Container::size; j++) {
@@ -92,7 +105,23 @@ namespace Scene {
                 for (int i = 0; i < Physic::Container::size; i++) {
                     for (int j = 0; j < Physic::Container::size; j++) {
                         glBegin(GL_POINTS);
-                        Hsv(((int)container.density[Physic::IX(i,j,Physic::Container::size)]), 1, 1, 255);
+                        Hsv(((int) container.density[Physic::IX(i, j, Physic::Container::size)]), 1, 1, 255);
+                        glVertex2i(i * POINT_SIZE + POINT_OFFSET, j * POINT_SIZE + POINT_OFFSET);
+                        glEnd();
+                    }
+                }
+                break;
+            case Previous:
+                for (int i = 0; i < Physic::Container::size; i++) {
+                    for (int j = 0; j < Physic::Container::size; j++) {
+                        int r = (int) Physic::Container::MapToRange(
+                                container.px[Physic::IX(i, j, Physic::Container::size)], -0.05f, 0.05f, 0, 255);
+                        int g = (int) Physic::Container::MapToRange(
+                                container.py[Physic::IX(i, j, Physic::Container::size)], -0.05f, 0.05f, 0, 255);
+                        int b = 255;
+
+                        glBegin(GL_POINTS);
+                        Color::Direct(r, g, b);
                         glVertex2i(i * POINT_SIZE + POINT_OFFSET, j * POINT_SIZE + POINT_OFFSET);
                         glEnd();
                     }
@@ -100,7 +129,7 @@ namespace Scene {
                 break;
         };
 
-        this->container.FadeDensity(GridSize);
+        this->container.FadeDensity();
 
         glBegin(GL_POINTS);
         Color::White().setGL();
@@ -118,17 +147,8 @@ namespace Scene {
         if (key == 27) { Keys.esc = 0; }
 
         if (key == 98) {
-            switch (editState) {
-                case Normal:
-                    editState = States::Velocity;
-                    break;
-                case Velocity:
-                    editState = States::HSL;
-                    break;
-                case HSL:
-                    editState = States::Normal;
-                    break;
-            }
+            currentState = StatesList[(int) currentState].next;
+            this->displayInfoText(StatesList[(int) currentState].name, 3);
         }
 
         glutPostRedisplay();

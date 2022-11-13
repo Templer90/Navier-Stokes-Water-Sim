@@ -6,11 +6,11 @@
 #include "Full.h"
 #include <GL/glut.h>
 #include "IX.h"
+#include <math.h>
 
 namespace Scene {
-
     Full::Full() {
-        container = Physic::Container(0.2f, 0, 0.0000001f);
+        container = Physic::Container(0.2f, 0.0f, 0.0000001f);
         Name = "Navier-Stokes";
     }
 
@@ -72,6 +72,12 @@ namespace Scene {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glPointSize((int) POINT_SIZE);
 
+        /*
+        this->container.AddDensity(30, 30, 200);
+        float angle=(float)FrameCounter/300.0f;
+        this->container.AddVelocity(60, 60, sin(angle),cos(angle));
+         */
+
         this->container.Step();
 
         switch (currentState) {
@@ -131,7 +137,7 @@ namespace Scene {
                 break;
         }
 
-        this->container.FadeDensity(0.05f);
+        this->container.FadeDensity(0.5f);
 
         glBegin(GL_POINTS);
         Color::White().setGL();

@@ -31,18 +31,18 @@ namespace Physic {
             x[Physics::IXBuffer[N - 1][j]] = dir * x[Physics::IXBuffer[N - 2][j]];
         }
 
-        x[Physics::IXBuffer[0][ 0]] = 0.33f * (x[Physics::IXBuffer[1][ 0]]
-                                  + x[Physics::IXBuffer[0][ 1]]
-                                  + x[Physics::IXBuffer[0][ 0]]);
-        x[Physics::IXBuffer[0][ N - 1]] = 0.33f * (x[Physics::IXBuffer[1][ N - 1]]
-                                      + x[Physics::IXBuffer[0][ N - 2]]
-                                      + x[Physics::IXBuffer[0][ N - 1]]);
-        x[Physics::IXBuffer[N - 1][ 0]] = 0.33f * (x[Physics::IXBuffer[N - 2][ 0]]
-                                      + x[Physics::IXBuffer[N - 1][ 1]]
-                                      + x[Physics::IXBuffer[N - 1][ 0]]);
-        x[Physics::IXBuffer[N - 1][ N - 1]] = 0.33f * (x[Physics::IXBuffer[N - 2][ N - 1]]
-                                          + x[Physics::IXBuffer[N - 1][ N - 2]]
-                                          + x[Physics::IXBuffer[N - 1][ N - 1]]);
+        x[Physics::IXBuffer[0][0]] = 0.33f * (x[Physics::IXBuffer[1][0]]
+                                  + x[Physics::IXBuffer[0][1]]
+                                  + x[Physics::IXBuffer[0][0]]);
+        x[Physics::IXBuffer[0][N - 1]] = 0.33f * (x[Physics::IXBuffer[1][N - 1]]
+                                      + x[Physics::IXBuffer[0][N - 2]]
+                                      + x[Physics::IXBuffer[0][N - 1]]);
+        x[Physics::IXBuffer[N - 1][0]] = 0.33f * (x[Physics::IXBuffer[N - 2][0]]
+                                      + x[Physics::IXBuffer[N - 1][1]]
+                                      + x[Physics::IXBuffer[N - 1][0]]);
+        x[Physics::IXBuffer[N - 1][N - 1]] = 0.33f * (x[Physics::IXBuffer[N - 2][N - 1]]
+                                          + x[Physics::IXBuffer[N - 1][N - 2]]
+                                          + x[Physics::IXBuffer[N - 1][N - 1]]);
     }
 
     void Physics::LinSolve(Boundry b, float x[], const float x0[], const float a, float c, int iter, int N) {

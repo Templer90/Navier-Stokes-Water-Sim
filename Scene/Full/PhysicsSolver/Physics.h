@@ -5,6 +5,9 @@
 #ifndef WATER_PHYSICS_H
 #define WATER_PHYSICS_H
 
+#include "../../../Constants.h"
+#include "../IX.h"
+
 namespace Physic {
     enum Boundry {
         None = 0,
@@ -14,7 +17,7 @@ namespace Physic {
 
     class Physics {
     private:
-        static void LinSolve(Boundry b, float x[], const float x0[], float a, float c, int iter, int N);
+        static void LinSolve(Boundry b, float x[], const float x0[], const float a, float c, int iter, int N);
 
         static void SetBnd(Boundry b, float x[], int N);
 
@@ -24,6 +27,8 @@ namespace Physic {
         static void Project(float vx[], float vy[], float p[], float div[], int iter, int N);
 
         static void Advect(Boundry b, float d[], float d0[], float vx[], float vy[], float dt, int N);
+
+        inline static int** IXBuffer={};
     };
 
 } // Physic

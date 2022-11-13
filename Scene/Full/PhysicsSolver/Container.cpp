@@ -8,11 +8,15 @@ namespace Physic {
     unsigned int IX(unsigned int x, unsigned int y, unsigned int N);
 
     Container::Container() = default;
+
+    void Init();
+
     Container::Container(float dt, float diff, float visc) {
         this->dt = dt;
         this->diff = diff;
         this->visc = visc;
 
+        Physic::Init();
         Physic::Container::InitArr(this->px, GridSize);
         Physic::Container::InitArr(this->py, GridSize);
         Physic::Container::InitArr(this->x, GridSize);
@@ -20,6 +24,8 @@ namespace Physic {
         Physic::Container::InitArr(this->previousDensity, GridSize);
         Physic::Container::InitArr(this->density, GridSize);
     }
+
+
 
     void Container::InitArr(float arr[], int size) {
         for (int i = 0; i < size; i++) {

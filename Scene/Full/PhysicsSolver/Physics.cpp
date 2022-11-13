@@ -7,47 +7,58 @@
 #include "../../../Constants.h"
 
 namespace Physic {
+    void Init() {
+        constexpr int N = GridWidth;
+        Physics::IXBuffer=new int*[N];
+        for (int i = 0; i < N ; i++) {
+            Physics::IXBuffer[i]=new int[N];
+            for (int j = 0; j < N ; j++) {
+                Physics::IXBuffer[i][j]=(int) IX(i, j, N);
+            }
+        }
+    }
+
     unsigned int IX(unsigned int x, unsigned int y, unsigned int N);
 
     void Physics::SetBnd(Boundry b, float x[], int N) {
         for (int i = 1; i < N - 1; i++) {
-            x[IX(i, 0, N)] = b == Boundry::YAxis ? -x[IX(i, 1, N)] : x[IX(i, 1, N)];
-            x[IX(i, N - 1, N)] = b == Boundry::YAxis ? -x[IX(i, N - 2, N)] : x[IX(i, N - 2, N)];
+            x[Physics::IXBuffer[i][ 0]] = b == Boundry::YAxis ? -x[Physics::IXBuffer[i][ 1]] : x[Physics::IXBuffer[i][ 1]];
+            x[Physics::IXBuffer[i][ N - 1]] = b == Boundry::YAxis ? -x[Physics::IXBuffer[i][ N - 2]] : x[Physics::IXBuffer[i][ N - 2]];
         }
 
         for (int j = 1; j < N - 1; j++) {
-            x[IX(0, j, N)] = b == Boundry::XAxis ? -x[IX(1, j, N)] : x[IX(1, j, N)];
-            x[IX(N - 1, j, N)] = b == Boundry::XAxis ? -x[IX(N - 2, j, N)] : x[IX(N - 2, j, N)];
+            x[Physics::IXBuffer[0][ j]] = b == Boundry::XAxis ? -x[Physics::IXBuffer[1][ j]] : x[Physics::IXBuffer[1][ j]];
+            x[Physics::IXBuffer[N - 1][ j]] = b == Boundry::XAxis ? -x[Physics::IXBuffer[N - 2][ j]] : x[Physics::IXBuffer[N - 2][ j]];
         }
 
-        x[IX(0, 0, N)] = 0.33f * (x[IX(1, 0, N)]
-                                  + x[IX(0, 1, N)]
-                                  + x[IX(0, 0, N)]);
-        x[IX(0, N - 1, N)] = 0.33f * (x[IX(1, N - 1, N)]
-                                      + x[IX(0, N - 2, N)]
-                                      + x[IX(0, N - 1, N)]);
-        x[IX(N - 1, 0, N)] = 0.33f * (x[IX(N - 2, 0, N)]
-                                      + x[IX(N - 1, 1, N)]
-                                      + x[IX(N - 1, 0, N)]);
-        x[IX(N - 1, N - 1, N)] = 0.33f * (x[IX(N - 2, N - 1, N)]
-                                          + x[IX(N - 1, N - 2, N)]
-                                          + x[IX(N - 1, N - 1, N)]);
+        x[Physics::IXBuffer[0][ 0]] = 0.33f * (x[Physics::IXBuffer[1][ 0]]
+                                  + x[Physics::IXBuffer[0][ 1]]
+                                  + x[Physics::IXBuffer[0][ 0]]);
+        x[Physics::IXBuffer[0][ N - 1]] = 0.33f * (x[Physics::IXBuffer[1][ N - 1]]
+                                      + x[Physics::IXBuffer[0][ N - 2]]
+                                      + x[Physics::IXBuffer[0][ N - 1]]);
+        x[Physics::IXBuffer[N - 1][ 0]] = 0.33f * (x[Physics::IXBuffer[N - 2][ 0]]
+                                      + x[Physics::IXBuffer[N - 1][ 1]]
+                                      + x[Physics::IXBuffer[N - 1][ 0]]);
+        x[Physics::IXBuffer[N - 1][ N - 1]] = 0.33f * (x[Physics::IXBuffer[N - 2][ N - 1]]
+                                          + x[Physics::IXBuffer[N - 1][ N - 2]]
+                                          + x[Physics::IXBuffer[N - 1][ N - 1]]);
     }
 
-    void Physics::LinSolve(Boundry b, float x[], const float x0[], float a, float c, int iter, int N) {
+    void Physics::LinSolve(Boundry b, float x[], const float x0[], const float a, float c, int iter, int N) {
         float cRecip = 1.0f / c;
+        int ij = 0;
         for (int k = 0; k < iter; k++) {
             for (int j = 1; j < N - 1; j++) {
                 for (int i = 1; i < N - 1; i++) {
-                    x[IX(i, j, N)] = (x0[IX(i, j, N)]
-                                      + a * (
-                            x[IX(i + 1, j, N)]
-                            + x[IX(i - 1, j, N)]
-                            + x[IX(i, j + 1, N)]
-                            + x[IX(i, j - 1, N)]
-                            + (x[IX(i, j, N)] * 2.0f)
-                                )
-                    ) * cRecip;
+                    ij = Physics::IXBuffer[i][j];
+                    x[ij] = (x0[ij]+ a * (
+                              x[ij + 1]//Works because of formula (j*N)+i
+                            + x[ij - 1]//Works because of formula (j*N)+i
+                            + x[Physics::IXBuffer[i][j + 1]]
+                            + x[Physics::IXBuffer[i][j - 1]]
+                            + (x[ij] * 2.0f)
+                    )) * cRecip;
                 }
             }
             Physics::SetBnd(b, x, N);

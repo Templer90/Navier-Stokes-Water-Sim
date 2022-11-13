@@ -18,7 +18,9 @@ namespace Scene {
         if (Keys.esc == 1) { exit(0); }
 
         if (Keys.mouseL) {
-            this->container.AddDensity(Keys.mouseX / POINT_SIZE, Keys.mouseY / POINT_SIZE, 200);
+            auto xPos = (float) Keys.mouseX / (int) POINT_SIZE;
+            auto yPos = (float) Keys.mouseY / (int) POINT_SIZE;
+            this->container.AddDensity(xPos, yPos, 200);
 
         }
         if (Keys.mouseR) {
@@ -37,7 +39,7 @@ namespace Scene {
         if (val > 1.f) val = 1.f;
 
         int h = hue / 60;
-        float f = float(hue) / 60 - h;
+        float f = float(hue) / 60 - (float)h;
         float p = val * (1.f - sat);
         float q = val * (1.f - sat * f);
         float t = val * (1.f - sat * (1 - f));
@@ -127,9 +129,9 @@ namespace Scene {
                     }
                 }
                 break;
-        };
+        }
 
-        this->container.FadeDensity();
+        this->container.FadeDensity(0.05f);
 
         glBegin(GL_POINTS);
         Color::White().setGL();
@@ -163,12 +165,14 @@ namespace Scene {
 
     void Full::mouseUp(helper::ButtonKeys Keys, int button, int x, int y) {
         if (button == helper::MouseButtons::R) {
-            float amountX = (Keys.mouseX - oldMouseX) / 1;
-            float amountY = (Keys.mouseY - oldMouseY) / 1;
+            auto amountX = (float) (Keys.mouseX - oldMouseX) / 1.0f;
+            auto amountY = (float) (Keys.mouseY - oldMouseY) / 1.0f;
 
             this->displayInfoText(std::to_string(amountY), 4);
-            this->container.AddVelocity(oldMouseX / POINT_SIZE, oldMouseY / POINT_SIZE, amountX, amountY);
 
+            auto xPos = (float) oldMouseX / (int) POINT_SIZE;
+            auto yPos = (float) oldMouseY / (int) POINT_SIZE;
+            this->container.AddVelocity(xPos, yPos, amountX, amountY);
         }
 
     }
@@ -179,7 +183,6 @@ namespace Scene {
         mouseX = Keys.mouseX / POINT_SIZE;
         mouseY = Keys.mouseY / POINT_SIZE;
     }
-
 }
 
 

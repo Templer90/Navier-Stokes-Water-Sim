@@ -39,7 +39,7 @@ namespace Physic {
 
         void Step();
 
-        void FadeDensity();
+        void FadeDensity(float delta);
 
 
         static float MapToRange(float value, float minIn, float maxIn, float minOut, float maxOut);

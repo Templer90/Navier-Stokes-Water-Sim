@@ -65,10 +65,10 @@ namespace Physic {
         return (result < minOut) ? minOut : (result > maxOut) ? maxOut : result;
     }
 
-    void Container::FadeDensity() {
+    void Container::FadeDensity(float delta) {
         for (int i = 0; i < Physic::Container::size; i++) {
             float d = this->density[i];
-            density[i] = (d - 0.05f < 0) ? 0 : d - 0.05f;
+            density[i] = (d - delta < 0) ? 0 : d - delta;
         }
     }
 } // Physic

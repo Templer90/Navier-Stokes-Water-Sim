@@ -7,6 +7,7 @@
 
 #include "../../../Constants.h"
 #include "../IX.h"
+#include "LookUP.cpp"
 
 namespace Physic {
     enum Boundry {
@@ -28,7 +29,9 @@ namespace Physic {
 
         static void Advect(Boundry b, float d[], const float d0[], const float vx[], const float vy[], float dt, int N);
 
-        inline static int** IXBuffer={};
+        static void AddConstantVector( float x[], float vector);
+
+        inline static LookUP lookup=LookUP(GridWidth);
     };
 
 } // Physic

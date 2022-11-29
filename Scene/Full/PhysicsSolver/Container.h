@@ -19,6 +19,7 @@ namespace Physic {
 
         static void InitArr(float arr[], int size);
 
+        void addVelocityAtTop(float vector);
     public:
         static const int size = GridWidth;
         static const int iterations = 16;

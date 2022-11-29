@@ -71,4 +71,12 @@ namespace Physic {
             density[i] = (d - delta < 0) ? 0 : d - delta;
         }
     }
+
+
+    void Container::addVelocityAtTop(float vector){
+        for (int i = 1; i < Physic::Container::size - 1; i++) {
+            this->y[Physic::LookUP::IJBuffer[i][1]] -= vector;
+        }
+
+    }
 } // Physic

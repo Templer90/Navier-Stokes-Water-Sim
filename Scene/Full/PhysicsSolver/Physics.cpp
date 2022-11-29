@@ -8,41 +8,34 @@
 
 namespace Physic {
     void Init() {
-        constexpr int N = GridWidth;
-        Physics::IXBuffer = new int *[N];
-        for (int i = 0; i < N; i++) {
-            Physics::IXBuffer[i] = new int[N];
-            for (int j = 0; j < N; j++) {
-                Physics::IXBuffer[i][j] = (int) IX(i, j, N);
-            }
-        }
+
     }
 
     void Physics::SetBnd(Boundry b, float x[], int N) {
         float dir = b == Boundry::YAxis ? -1.0f : 1.0f;
         for (int i = 1; i < N - 1; i++) {
-            x[Physics::IXBuffer[i][0]] = dir * x[Physics::IXBuffer[i][1]];
-            x[Physics::IXBuffer[i][N - 1]] = dir * x[Physics::IXBuffer[i][N - 2]];
+            x[Physic::LookUP::IJBuffer[i][0]] = dir * x[Physic::LookUP::IJBuffer[i][1]];
+            x[Physic::LookUP::IJBuffer[i][N - 1]] = dir * x[Physic::LookUP::IJBuffer[i][N - 2]];
         }
 
         dir = b == Boundry::XAxis ? -1.0f : 1.0f;
         for (int j = 1; j < N - 1; j++) {
-            x[Physics::IXBuffer[0][j]] = dir * x[Physics::IXBuffer[1][j]];
-            x[Physics::IXBuffer[N - 1][j]] = dir * x[Physics::IXBuffer[N - 2][j]];
+            x[Physic::LookUP::IJBuffer[0][j]] = dir * x[Physic::LookUP::IJBuffer[1][j]];
+            x[Physic::LookUP::IJBuffer[N - 1][j]] = dir * x[Physic::LookUP::IJBuffer[N - 2][j]];
         }
 
-        x[Physics::IXBuffer[0][0]] = 0.33f * (x[Physics::IXBuffer[1][0]]
-                                  + x[Physics::IXBuffer[0][1]]
-                                  + x[Physics::IXBuffer[0][0]]);
-        x[Physics::IXBuffer[0][N - 1]] = 0.33f * (x[Physics::IXBuffer[1][N - 1]]
-                                      + x[Physics::IXBuffer[0][N - 2]]
-                                      + x[Physics::IXBuffer[0][N - 1]]);
-        x[Physics::IXBuffer[N - 1][0]] = 0.33f * (x[Physics::IXBuffer[N - 2][0]]
-                                      + x[Physics::IXBuffer[N - 1][1]]
-                                      + x[Physics::IXBuffer[N - 1][0]]);
-        x[Physics::IXBuffer[N - 1][N - 1]] = 0.33f * (x[Physics::IXBuffer[N - 2][N - 1]]
-                                          + x[Physics::IXBuffer[N - 1][N - 2]]
-                                          + x[Physics::IXBuffer[N - 1][N - 1]]);
+        x[Physic::LookUP::IJ_00] = 0.33f * (x[Physic::LookUP::IJ_10]
+                                            + x[Physic::LookUP::IJ_01]
+                                            + x[Physic::LookUP::IJ_00]);
+        x[Physic::LookUP::IJ_0N] = 0.33f * (x[Physic::LookUP::IJBuffer[1][N - 1]]
+                                            + x[Physic::LookUP::IJBuffer[0][N - 2]]
+                                            + x[Physic::LookUP::IJ_0N]);
+        x[Physic::LookUP::IJ_N0] = 0.33f * (x[Physic::LookUP::IJBuffer[N - 2][0]]
+                                            + x[Physic::LookUP::IJBuffer[N - 1][1]]
+                                            + x[Physic::LookUP::IJ_N0]);
+        x[Physic::LookUP::IJ_NN] = 0.33f * (x[Physic::LookUP::IJBuffer[N - 2][N - 1]]
+                                            + x[Physic::LookUP::IJBuffer[N - 1][N - 2]]
+                                            + x[Physic::LookUP::IJ_NN]);
     }
 
     void Physics::LinSolve(Boundry b, float x[], const float x0[], const float a, float c, int iter, int N) {
@@ -51,12 +44,12 @@ namespace Physic {
         for (int k = 0; k < iter; k++) {
             for (int j = 1; j < N - 1; j++) {
                 for (int i = 1; i < N - 1; i++) {
-                    ij = Physics::IXBuffer[i][j];
-                    x[ij] = (x0[ij]+ a * (
-                              x[ij + 1]//Works because of formula (j*N)+i
+                    ij = Physic::LookUP::IJBuffer[i][j];
+                    x[ij] = (x0[ij] + a * (
+                            x[ij + 1]//Works because of formula (j*N)+i
                             + x[ij - 1]//Works because of formula (j*N)+i
-                            + x[Physics::IXBuffer[i][j + 1]]
-                            + x[Physics::IXBuffer[i][j - 1]]
+                            + x[Physic::LookUP::IJBuffer[i][j + 1]]
+                            + x[Physic::LookUP::IJBuffer[i][j - 1]]
                             + (x[ij] * 2.0f)
                     )) * cRecip;
                 }
@@ -66,22 +59,22 @@ namespace Physic {
     }
 
     void Physics::Diffuse(Boundry b, float x[], float x0[], float diff, float dt, int iter, int N) {
-        float a = dt * diff * (float)((N - 2) * (N - 2));
+        float a = dt * diff * (float) ((N - 2) * (N - 2));
         Physics::LinSolve(b, x, x0, a, 1 + 6 * a, iter, N);
     }
 
     void Physics::Project(float vx[], float vy[], float p[], float div[], int iter, int N) {
-        auto floatN=(float)N;
-        int ij=0;
+        auto floatN = (float) N;
+        int ij = 0;
 
         for (int j = 1; j < N - 1; j++) {
             for (int i = 1; i < N - 1; i++) {
-                ij = Physics::IXBuffer[i][j];
+                ij = Physic::LookUP::IJBuffer[i][j];
                 div[ij] = -0.5f * (
-                        vx[ij+1]//Works because of formula (j*N)+i
-                        - vx[ij-1]//Works because of formula (j*N)+i
-                        + vy[Physics::IXBuffer[i][j+1]]
-                        - vy[Physics::IXBuffer[i][j-1]]
+                        vx[ij + 1]//Works because of formula (j*N)+i
+                        - vx[ij - 1]//Works because of formula (j*N)+i
+                        + vy[Physic::LookUP::IJBuffer[i][j + 1]]
+                        - vy[Physic::LookUP::IJBuffer[i][j - 1]]
                 ) / floatN;
                 p[ij] = 0;
             }
@@ -93,9 +86,10 @@ namespace Physic {
 
         for (int j = 1; j < N - 1; j++) {
             for (int i = 1; i < N - 1; i++) {
-                ij = Physics::IXBuffer[i][j];
-                vx[ij] -= 0.5f * (p[ij+1] - p[ij-1]) * floatN;//Works because of formula (j*N)+i
-                vy[ij] -= 0.5f * (p[Physics::IXBuffer[i][j+1]] - p[Physics::IXBuffer[i][j-1]]) * floatN;
+                ij = Physic::LookUP::IJBuffer[i][j];
+                vx[ij] -= 0.5f * (p[ij + 1] - p[ij - 1]) * floatN;//Works because of formula (j*N)+i
+                vy[ij] -=
+                        0.5f * (p[Physic::LookUP::IJBuffer[i][j + 1]] - p[Physic::LookUP::IJBuffer[i][j - 1]]) * floatN;
             }
         }
         Physics::SetBnd(Boundry::XAxis, vx, N);
@@ -104,7 +98,7 @@ namespace Physic {
 
     void Physics::Advect(Boundry b, float d[], const float d0[], const float vx[], const float vy[], float dt, int N) {
         float i0, i1, j0, j1;
-        auto floatN = (float)N;
+        auto floatN = (float) N;
 
         float dtx = dt * (floatN - 2.0f);
         float dty = dt * (floatN - 2.0f);
@@ -116,10 +110,10 @@ namespace Physic {
 
         int i, j;
 
-        int ij=0;
+        int ij = 0;
         for (j = 1, jfloat = 1; j < N - 1; j++, jfloat++) {
             for (i = 1, ifloat = 1; i < N - 1; i++, ifloat++) {
-                ij = Physics::IXBuffer[i][j];
+                ij = Physic::LookUP::IJBuffer[i][j];
                 tmp1 = dtx * vx[ij];
                 tmp2 = dty * vy[ij];
                 x = ifloat - tmp1;
@@ -152,4 +146,11 @@ namespace Physic {
         }
         Physics::SetBnd(b, d, N);
     }
+
+    void Physics::AddConstantVector(float *x, float vector) {
+        for (int i = 0; i < Physic::LookUP::MaxIndex; i++) {
+            x[i] += vector;
+        }
+    }
+
 } // Physic

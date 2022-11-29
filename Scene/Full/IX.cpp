@@ -3,7 +3,6 @@
 //
 
 #include "IX.h"
-#include "../../Constants.h"
 
 namespace Physic{
 

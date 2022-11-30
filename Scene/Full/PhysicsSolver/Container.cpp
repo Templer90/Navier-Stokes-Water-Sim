@@ -46,7 +46,6 @@ namespace Physic {
     }
 
     void Container::Step() {
-        this->diff+=0.00000001f;
         const int constSize = Physic::Container::size;
         const int iter = Physic::Container::iterations;
 

@@ -38,7 +38,7 @@ namespace Physic {
                                             + x[Physic::LookUP::IJ_NN]);
     }
 
-    void Physics::LinSolve(Boundry b, float x[], const float x0[], const float a, float c, int iter, int N) {
+    void Physics::LinSolve(Boundry b, float x[], const float x0[], const float a, float c, const int iter, const int N) {
         float cRecip = 1.0f / c;
         int ij = 0;
         for (int k = 0; k < iter; k++) {

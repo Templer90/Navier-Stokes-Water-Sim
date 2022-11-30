@@ -97,9 +97,9 @@ namespace Scene {
                 for (int i = 0; i < Physic::Container::size; i++) {
                     for (int j = 0; j < Physic::Container::size; j++) {
                         int r = (int) Physic::Container::MapToRange(
-                                container.x[Physic::IX(i, j, Physic::Container::size)], -0.05f, 0.05f, 0, 255);
+                                container.x[Physic::IX(i, j, Physic::Container::size)], -0.005f, 0.005f, 0, 255);
                         int g = (int) Physic::Container::MapToRange(
-                                container.y[Physic::IX(i, j, Physic::Container::size)], -0.05f, 0.05f, 0, 255);
+                                container.y[Physic::IX(i, j, Physic::Container::size)], -0.005f, 0.005f, 0, 255);
                         int b = 255;
 
                         glBegin(GL_POINTS);

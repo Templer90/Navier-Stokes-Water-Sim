@@ -3,6 +3,7 @@
 //
 
 #include "Container.h"
+#include<thread>
 
 namespace Physic {
     unsigned int IX(unsigned int x, unsigned int y, unsigned int N);
@@ -45,18 +46,41 @@ namespace Physic {
     }
 
     void Container::Step() {
-        Physic::Physics::Diffuse(Boundry::XAxis, this->px, this->x, this->visc, this->dt, Physic::Container::iterations, Physic::Container::size);
-        Physic::Physics::Diffuse(Boundry::YAxis, this->py, this->y, this->visc, this->dt, Physic::Container::iterations, Physic::Container::size);
+        this->diff+=0.00000001f;
+        const int constSize = Physic::Container::size;
+        const int iter = Physic::Container::iterations;
 
-        Physic::Physics::Project(this->px, this->py, this->x, this->y, Physic::Container::iterations, Physic::Container::size);
+#if MULTITHREADED == 1
+        std::thread threadXDiffuse(Physic::Physics::Diffuse,Boundry::XAxis, this->px, this->x, this->visc, this->dt, iter, constSize);
+        std::thread threadYDiffuse(Physic::Physics::Diffuse,Boundry::YAxis, this->py, this->y, this->visc, this->dt, iter, constSize);
+        threadXDiffuse.join();
+        threadYDiffuse.join();
+#else
+        Physic::Physics::Diffuse(Boundry::XAxis, this->px, this->x, this->visc, this->dt, iter, constSize);
+        Physic::Physics::Diffuse(Boundry::YAxis, this->py, this->y, this->visc, this->dt, iter, constSize);
+#endif
+        Physic::Physics::Project(this->px, this->py, this->x, this->y, iter, Physic::Container::size);
+#if MULTITHREADED == 1
+        std::thread threadXAdvect(Physic::Physics::Advect, Boundry::XAxis, this->x, this->px, this->px, this->py, this->dt, constSize);
+        std::thread threadYAdvect(Physic::Physics::Advect, Boundry::YAxis, this->y, this->py, this->px, this->py, this->dt, constSize);
+        threadXAdvect.join();
+        threadYAdvect.join();
+#else
+        Physic::Physics::Advect(Boundry::XAxis, this->x, this->px, this->px, this->py, this->dt, constSize);
+        Physic::Physics::Advect(Boundry::YAxis, this->y, this->py, this->px, this->py, this->dt, constSize);
+#endif
+        Physic::Physics::Project(this->x, this->y, this->px, this->py, iter, constSize);
 
-        Physic::Physics::Advect(Boundry::XAxis, this->x, this->px, this->px, this->py, this->dt, Physic::Container::size);
-        Physic::Physics::Advect(Boundry::YAxis, this->y, this->py, this->px, this->py, this->dt, Physic::Container::size);
 
-        Physic::Physics::Project(this->x, this->y, this->px, this->py, Physic::Container::iterations, Physic::Container::size);
-
-        Physic::Physics::Diffuse(Boundry::None, this->previousDensity, this->density, this->diff, this->dt, Physic::Container::iterations, Physic::Container::size);
-        Physic::Physics::Advect(Boundry::None, this->density, this->previousDensity, this->x, this->y, this->dt, Physic::Container::size);
+#if MULTITHREADED == 1
+        std::thread threadNoneDiffuse(Physic::Physics::Diffuse, Boundry::None, this->previousDensity, this->density, this->diff, this->dt, iter, constSize);
+        std::thread threadNoneAdvect(Physic::Physics::Advect, Boundry::None, this->density, this->previousDensity, this->x, this->y, this->dt, constSize);
+        threadNoneDiffuse.join();
+        threadNoneAdvect.join();
+#else
+        Physic::Physics::Diffuse(Boundry::None, this->previousDensity, this->density, this->diff, this->dt, iter, constSize);
+        Physic::Physics::Advect(Boundry::None, this->density, this->previousDensity, this->x, this->y, this->dt, constSize);
+#endif
     }
 
     float Container::MapToRange(float val, float minIn, float maxIn, float minOut, float maxOut) {
@@ -75,7 +99,7 @@ namespace Physic {
 
     void Container::addVelocityAtTop(float vector){
         for (int i = 1; i < Physic::Container::size - 1; i++) {
-            this->y[Physic::LookUP::IJBuffer[i][1]] -= vector;
+            this->py[Physic::LookUP::IJBuffer[i][1]] += vector;
         }
 
     }

@@ -1,6 +1,8 @@
 #ifndef WATER_CONSTANTS_H
 #define WATER_CONSTANTS_H
 
+#define MULTITHREADED 0 // (1/0) On/Off
+
 #define ScreenWidth 512
 #define ScreenHeight 512
 
